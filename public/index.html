@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+</head>
+
+<body data-ng-app="app">
+    <header class="header">
+        <div class="container">
+        </div>
+    </header>
+    <section class="section">
+        <div class="container is-fluid">
+            <div class="heading">
+                <h1 class="title">Section</h1>
+                <h2 class="subtitle">A simple container to divide your page into <strong>sections</strong>, like the one you're currently reading</h2>
+            </div>
+            <div data-ng-controller="ctrl" class="columns">
+                <div class="column">
+                    <p class="control is-grouped">
+                        <input data-ng-model="url" class="input" type="text" placeholder="URL">
+                    </p>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <youtube-video data-video-id="videoId" player="player" class="embed-responsive-item"></youtube-video>
+                    </div>
+                    <p class="control is-grouped">
+                        <input data-ng-model="entry" ng-keyup="$event.keyCode == 13 && addToList($event)" class="input" type="text" placeholder="Title">
+                    </p>
+                </div>
+                <div class="column">
+                    <p class="control is-grouped" data-ng-repeat="l in list track by $index">
+                        <a class="button is-info is-outlined" data-ng-click="changeTime($index, -1)"><i class="fa fa-minus"></i></a>
+                        <a class="button is-info is-outlined" data-ng-click="changeTime($index, 1)"><i class="fa fa-plus"></i></a>
+                        <a class="button is-info" data-ng-click="moveTo(l.seconds)">{{l.currentTimeString}}</a>
+                        <input data-ng-model="l.title" class="input is-info" type="text" placeholder="Title">
+                    </p>
+                    <pre>{{toCopy()}}</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="container">
+        </div>
+    </footer>
+    <script src="bundle.js"></script>
+</body>
+
+</html>
