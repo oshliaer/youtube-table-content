@@ -1,11 +1,12 @@
 'use strict';
+
 var angular = require('angularjs');
 var ctrl = require('./app.controller.js');
 var tools = require('./app.factory.tools.js');
 var aye = require('angular-youtube-embed');
 
 angular.module('app', ['youtube-embed'])
-	.controller('ctrl', ['$scope', 'tools', 'youtubeEmbedUtils', ctrl])
+	.controller('ctrl', ['$scope', 'tools', 'youtubeEmbedUtils', '$filter', ctrl])
 	.factory('tools', tools);
 
 /* 2. This code loads the IFrame Player API code asynchronously.
