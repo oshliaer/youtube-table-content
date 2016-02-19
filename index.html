@@ -22,21 +22,22 @@
             <div data-ng-controller="ctrl" class="columns">
                 <div class="column">
                     <p class="control is-grouped">
-                        <input data-ng-model="url" class="input" type="text" placeholder="URL">
+                        <input data-ng-model="url" class="input" type="text" placeholder="YouTube URL or ID">
                     </p>
                     <div class="embed-responsive embed-responsive-16by9">
                         <youtube-video data-video-id="videoId" player="player" class="embed-responsive-item"></youtube-video>
                     </div>
                     <p class="control is-grouped">
-                        <input data-ng-model="entry" ng-keyup="$event.keyCode == 13 && addToList($event)" class="input" type="text" placeholder="Title">
+                        <input data-ng-model="entry" ng-keyup="$event.keyCode == 13 && addToList($event)" class="input" type="text" placeholder="Input title of contents and Enter">
                     </p>
                 </div>
                 <div class="column">
-                    <p class="control is-grouped" data-ng-repeat="l in list track by $index">
-                        <a class="button is-info is-outlined" data-ng-click="changeTime($index, -1)"><i class="fa fa-minus"></i></a>
-                        <a class="button is-info is-outlined" data-ng-click="changeTime($index, 1)"><i class="fa fa-plus"></i></a>
+                    <p class="control is-grouped" data-ng-repeat="l in list | orderBy:'seconds' track by $index ">
+                        <a class="button is-info is-outlined" data-ng-click="changeTime(l.$id, -1)"><i class="fa fa-minus"></i></a>
+                        <a class="button is-info is-outlined" data-ng-click="changeTime(l.$id, 1)"><i class="fa fa-plus"></i></a>
                         <a class="button is-info" data-ng-click="moveTo(l.seconds)">{{l.currentTimeString}}</a>
                         <input data-ng-model="l.title" class="input is-info" type="text" placeholder="Title">
+                        <a class="button is-info is-outlined" data-ng-href="{{'http://www.youtube.com/watch?v=' + videoId + '&t=' + l.currentTimeString}}" target="_blank"><i class="fa fa-link"></i></a>
                     </p>
                     <pre>{{toCopy()}}</pre>
                 </div>
