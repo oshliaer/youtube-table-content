@@ -6,8 +6,8 @@ var tools = require('./app.factory.tools.js');
 var aye = require('angular-youtube-embed');
 
 angular.module('app', ['youtube-embed'])
-	.controller('ctrl', ['$scope', 'tools', 'youtubeEmbedUtils', '$filter', ctrl])
-	.factory('tools', tools);
+    .controller('ctrl', ['$scope', 'tools', 'youtubeEmbedUtils', '$filter', ctrl])
+    .factory('tools', tools);
 
 /* 2. This code loads the IFrame Player API code asynchronously.
 var tag = document.createElement('script');
@@ -57,3 +57,45 @@ function stopVideo() {
         player.stopVideo();
 }
 */
+// accepts optional transformer
+// now transformers are compatible with ES6
+String.prototype.template = function (fn, object) {
+    'use strict';
+    // Andrea Giammarchi - WTFPL License
+    var
+        hasTransformer = typeof fn === 'function',
+        stringify = JSON.stringify,
+        re = /\$\{([\S\s]*?)\}/g,
+        strings = [],
+        values = hasTransformer ? [] : strings,
+        i = 0,
+        str,
+        m;
+    while ((m = re.exec(this))) {
+        str = this.slice(i, m.index);
+        if (hasTransformer) {
+            strings.push(str);
+            values.push('(' + m[1] + ')');
+        } else {
+            strings.push(stringify(str), '(' + m[1] + ')');
+        }
+        i = re.lastIndex;
+    }
+    str = this.slice(i);
+    strings.push(hasTransformer ? str : stringify(str));
+    if (hasTransformer) {
+        str = 'function' + (Math.random() * 1e5 | 0);
+        strings = [
+            str,
+            'with(this)return ' + str + '(' + stringify(strings) + (
+                values.length ? (',' + values.join(',')) : ''
+            ) + ')'
+        ];
+    } else {
+        strings = ['with(this)return ' + strings.join('+')];
+    }
+    return Function.apply(null, strings).call(
+        hasTransformer ? object : fn,
+        hasTransformer && fn
+    );
+};

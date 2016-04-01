@@ -2,6 +2,7 @@ module.exports = function ($scope, tools, youtubeEmbedUtils, $filter) {
     $scope.videoId = '';
     $scope.entry = '';
     $scope.list = [];
+    $scope.exportType = 'txt';
     $scope.addToList = function () {
         if ($scope.entry.length < 1) return;
         var currentTime = $scope.player.getCurrentTime();
@@ -53,16 +54,28 @@ module.exports = function ($scope, tools, youtubeEmbedUtils, $filter) {
         $scope.moveTo(l.seconds);
     }
 
-    $scope.toCopy = function () {
+    $scope.toCopy = function (type) {
+        var tmplts = {
+            'txt': '${time} ${title}',
+            'html': '<a href="http://www.youtube.com/watch?v=${videoId}&t=${time}">${title}</a>',
+            'md': '[${time} ${title}](http://www.youtube.com/watch?v=${videoId}&t=${time})'
+        }
+        mask = tmplts[type] || tmplts['txt'];
         var arr = [].concat($scope.list);
         arr.sort(function (a, b) {
-            return a.seconds - b.seconds
+            return a.seconds - b.seconds;
         });
         return arr.map(function (e) {
-            return tools.secToTime(e.seconds) + ' ' + e.title;
+            this.options.time = e.currentTimeString;
+            this.options.title = e.title;
+            return this.mask.template(this.options); //this.replace('%s', tools.secToTime(e.seconds) + ' ' + e.title;
+        }, {
+            mask: mask,
+            options: {
+                videoId: $scope.videoId
+            }
         }).join('\n');
     }
-
     $scope.$watch(function () {
         return $scope.url;
     }, function (cV, pV) {
@@ -76,7 +89,8 @@ module.exports = function ($scope, tools, youtubeEmbedUtils, $filter) {
             $scope.player.playVideo()
         } else {
             $scope.player.pauseVideo();
-        }});
+        }
+    });
     /*
             $scope.$on('youtube.player.ended', function($event, player) {
                     player.playVideo();
