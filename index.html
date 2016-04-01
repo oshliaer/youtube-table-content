@@ -32,7 +32,7 @@
                     </p>
                 </div>
                 <div class="column">
-                    <p class="control is-grouped" data-ng-repeat="l in list | orderBy:'seconds' track by $index ">
+                    <p class="control is-grouped" data-ng-repeat="l in list | orderBy:'seconds' track by $index">
                         <a class="button is-info is-outlined" data-ng-click="changeTime(l.$id, -1)"><i class="fa fa-minus"></i></a>
                         <a class="button is-info is-outlined" data-ng-click="changeTime(l.$id, 1)"><i class="fa fa-plus"></i></a>
                         <a class="button is-info" data-ng-click="moveTo(l.seconds)">{{l.currentTimeString}}</a>
@@ -40,7 +40,20 @@
                         <a class="button is-info is-outlined" data-ng-href="{{'http://www.youtube.com/watch?v=' + videoId + '&t=' + l.currentTimeString}}" target="_blank"><i class="fa fa-link"></i></a>
                         <a class="button is-danger is-outlined" data-ng-click="remove(l)"><i class="fa fa-trash"></i></a>
                     </p>
-                    <pre>{{toCopy()}}</pre>
+                    <p class="control is-grouped">
+                        <label>
+                            <input type="radio" ng-model="exportType" value="txt">YouTube
+                        </label>
+                        <label>
+                            <input type="radio" ng-model="exportType" value="html">HTML
+                        </label>
+                        <label>
+                            <input type="radio" ng-model="exportType" value="md">MD
+                        </label>
+                    </p>
+                    <p class="control is-grouped">
+                        <pre>{{toCopy(exportType)}}</pre>
+                    </p>
                 </div>
             </div>
         </div>

@@ -30979,6 +30979,7 @@ module.exports = function ($scope, tools, youtubeEmbedUtils, $filter) {
     $scope.videoId = '';
     $scope.entry = '';
     $scope.list = [];
+    $scope.exportType = 'txt';
     $scope.addToList = function () {
         if ($scope.entry.length < 1) return;
         var currentTime = $scope.player.getCurrentTime();
@@ -31030,16 +31031,28 @@ module.exports = function ($scope, tools, youtubeEmbedUtils, $filter) {
         $scope.moveTo(l.seconds);
     }
 
-    $scope.toCopy = function () {
+    $scope.toCopy = function (type) {
+        var tmplts = {
+            'txt': '${time} ${title}',
+            'html': '<a href="http://www.youtube.com/watch?v=${videoId}&t=${time}">${title}</a>',
+            'md': '[${time} ${title}](http://www.youtube.com/watch?v=${videoId}&t=${time})'
+        }
+        mask = tmplts[type] || tmplts['txt'];
         var arr = [].concat($scope.list);
         arr.sort(function (a, b) {
-            return a.seconds - b.seconds
+            return a.seconds - b.seconds;
         });
         return arr.map(function (e) {
-            return tools.secToTime(e.seconds) + ' ' + e.title;
+            this.options.time = e.currentTimeString;
+            this.options.title = e.title;
+            return this.mask.template(this.options); //this.replace('%s', tools.secToTime(e.seconds) + ' ' + e.title;
+        }, {
+            mask: mask,
+            options: {
+                videoId: $scope.videoId
+            }
         }).join('\n');
     }
-
     $scope.$watch(function () {
         return $scope.url;
     }, function (cV, pV) {
@@ -31053,7 +31066,8 @@ module.exports = function ($scope, tools, youtubeEmbedUtils, $filter) {
             $scope.player.playVideo()
         } else {
             $scope.player.pauseVideo();
-        }});
+        }
+    });
     /*
             $scope.$on('youtube.player.ended', function($event, player) {
                     player.playVideo();
@@ -31119,8 +31133,8 @@ var tools = require('./app.factory.tools.js');
 var aye = require('angular-youtube-embed');
 
 angular.module('app', ['youtube-embed'])
-	.controller('ctrl', ['$scope', 'tools', 'youtubeEmbedUtils', '$filter', ctrl])
-	.factory('tools', tools);
+    .controller('ctrl', ['$scope', 'tools', 'youtubeEmbedUtils', '$filter', ctrl])
+    .factory('tools', tools);
 
 /* 2. This code loads the IFrame Player API code asynchronously.
 var tag = document.createElement('script');
@@ -31170,5 +31184,46 @@ function stopVideo() {
         player.stopVideo();
 }
 */
-
+// accepts optional transformer
+// now transformers are compatible with ES6
+String.prototype.template = function (fn, object) {
+    'use strict';
+    // Andrea Giammarchi - WTFPL License
+    var
+        hasTransformer = typeof fn === 'function',
+        stringify = JSON.stringify,
+        re = /\$\{([\S\s]*?)\}/g,
+        strings = [],
+        values = hasTransformer ? [] : strings,
+        i = 0,
+        str,
+        m;
+    while ((m = re.exec(this))) {
+        str = this.slice(i, m.index);
+        if (hasTransformer) {
+            strings.push(str);
+            values.push('(' + m[1] + ')');
+        } else {
+            strings.push(stringify(str), '(' + m[1] + ')');
+        }
+        i = re.lastIndex;
+    }
+    str = this.slice(i);
+    strings.push(hasTransformer ? str : stringify(str));
+    if (hasTransformer) {
+        str = 'function' + (Math.random() * 1e5 | 0);
+        strings = [
+            str,
+            'with(this)return ' + str + '(' + stringify(strings) + (
+                values.length ? (',' + values.join(',')) : ''
+            ) + ')'
+        ];
+    } else {
+        strings = ['with(this)return ' + strings.join('+')];
+    }
+    return Function.apply(null, strings).call(
+        hasTransformer ? object : fn,
+        hasTransformer && fn
+    );
+};
 },{"./app.controller.js":6,"./app.factory.tools.js":7,"angular-youtube-embed":1,"angularjs":5}]},{},[8]);
